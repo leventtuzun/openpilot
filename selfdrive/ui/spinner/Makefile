@@ -1,7 +1,9 @@
 CC = clang
 CXX = clang++
 
-PHONELIBS = ../../../phonelibs
+ROOT_DIR = ../../..
+PHONELIBS = $(ROOT_DIR)/phonelibs
+COMMON = $(ROOT)/selfdrive/common
 
 WARN_FLAGS = -Werror=implicit-function-declaration \
              -Werror=incompatible-pointer-types \
@@ -10,7 +12,7 @@ WARN_FLAGS = -Werror=implicit-function-declaration \
              -Werror=format-extra-args
 
 CFLAGS = -std=gnu11 -fPIC -O2 $(WARN_FLAGS)
-CXXFLAGS = -std=c++11 -fPIC -O2 $(WARN_FLAGS)
+CXXFLAGS = -std=c++1z -fPIC -O2 $(WARN_FLAGS)
 
 NANOVG_FLAGS = -I$(PHONELIBS)/nanovg
 
@@ -19,9 +21,10 @@ OPENGL_LIBS = -lGLESv3
 FRAMEBUFFER_LIBS = -lutils -lgui -lEGL
 
 OBJS = spinner.o \
-       ../../common/framebuffer.o \
+       $(COMMON)/framebuffer.o \
+       $(COMMON)/util.o \
        $(PHONELIBS)/nanovg/nanovg.o \
-       ../../common/spinner.o \
+       $(COMMON)/spinner.o \
        opensans_semibold.o \
        img_spinner_track.o \
        img_spinner_comma.o
@@ -40,7 +43,7 @@ spinner: $(OBJS)
         $(OPENGL_LIBS) \
         -lm -llog
 
-../../common/framebuffer.o: ../../common/framebuffer.cc
+$(COMMON)/framebuffer.o: $(COMMON)/framebuffer.cc
 	@echo "[ CXX ] $@"
 	$(CXX) $(CXXFLAGS) -MMD \
            -I$(PHONELIBS)/android_frameworks_native/include \
@@ -48,15 +51,15 @@ spinner: $(OBJS)
            -I$(PHONELIBS)/android_hardware_libhardware/include \
            -c -o '$@' '$<'
 
-opensans_semibold.o: ../../assets/fonts/opensans_semibold.ttf
+opensans_semibold.o: $(ROOT_DIR)/selfdrive/assets/fonts/opensans_semibold.ttf
 	@echo "[ bin2o ] $@"
 	cd '$(dir $<)' && ld -r -b binary '$(notdir $<)' -o '$(abspath $@)'
 
-img_spinner_track.o: ../../assets/img_spinner_track.png
+img_spinner_track.o: $(ROOT_DIR)/selfdrive/assets/img_spinner_track.png
 	@echo "[ bin2o ] $@"
 	cd '$(dir $<)' && ld -r -b binary '$(notdir $<)' -o '$(abspath $@)'
 
-img_spinner_comma.o: ../../assets/img_spinner_comma.png
+img_spinner_comma.o: $(ROOT_DIR)/selfdrive/assets/img_spinner_comma.png
 	@echo "[ bin2o ] $@"
 	cd '$(dir $<)' && ld -r -b binary '$(notdir $<)' -o '$(abspath $@)'
 
